@@ -1,0 +1,27 @@
+# ─────────────────────────────────────────────
+# SCAM SENSE AI — Python Dependencies
+# ─────────────────────────────────────────────
+# Install all with:
+#     pip install -r requirements.txt
+# ─────────────────────────────────────────────
+
+# Web Framework
+flask==3.0.3
+
+# Rate Limiting
+flask-limiter==3.8.0
+
+# Image Processing (for OCR)
+Pillow==10.4.0
+
+# OCR Engine (requires Tesseract installed on system)
+pytesseract==0.3.13
+
+# HTTP Requests (for AI engine connection)
+requests==2.32.3
+
+# Environment Variable Loader
+python-dotenv==1.0.1
+
+# Production WSGI Server
+gunicorn==22.0.0

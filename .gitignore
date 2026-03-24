@@ -1,0 +1,61 @@
+# ─────────────────────────────────────────────
+# SCAM SENSE AI — Git Ignore Rules
+# Files and folders listed here will NEVER
+# be uploaded to GitHub.
+# ─────────────────────────────────────────────
+
+
+# ── Private Environment Variables ────────────
+# Contains secret keys and AI engine URL
+.env
+
+
+# ── Database ──────────────────────────────────
+# Contains real user scan data
+database/scans.db
+
+
+# ── Uploaded Screenshots ──────────────────────
+# Temporary user uploads — never store in Git
+uploads/*
+# Keep the uploads folder itself (not its contents)
+!uploads/.gitkeep
+
+
+# ── Python Virtual Environment ────────────────
+venv/
+env/
+.venv/
+
+
+# ── Python Cache Files ────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyc
+*$py.class
+
+
+# ── VS Code Settings ──────────────────────────
+.vscode/
+
+
+# ── macOS System Files ────────────────────────
+.DS_Store
+
+
+# ── Windows System Files ──────────────────────
+Thumbs.db
+desktop.ini
+
+
+# ── Pytest / Test Cache ───────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+
+
+# ── Build / Distribution ──────────────────────
+dist/
+build/
+*.egg-info/
