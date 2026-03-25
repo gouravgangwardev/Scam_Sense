@@ -4,6 +4,10 @@
   {% elif error_code == 429 %}Too Many Requests
   {% elif error_code == 413 %}File Too Large
   {% elif error_code == 500 %}Server Error
+  {% elif error_code == 400 %}Bad Request
+  {% elif error_code == 405 %}Method Not Allowed
+  {% elif error_code == "OCR" %}Image Read Error
+  {% elif error_code == "AI" %}Analysis Unavailable
   {% else %}Error
   {% endif %}
   — ScamSense AI
@@ -14,7 +18,7 @@
 <section class="error-page">
   <div class="error-container">
 
-
+    <!-- Error Code Display -->
     <div class="error-code-wrap">
       <div class="error-code">
         {% if error_code == 404 %}404
@@ -31,7 +35,7 @@
       <div class="error-glow"></div>
     </div>
 
-
+    <!-- Error Icon -->
     <div class="error-icon">
       {% if error_code == 404 %}🔍
       {% elif error_code == 429 %}⏱
@@ -45,13 +49,13 @@
       {% endif %}
     </div>
 
-
+    <!-- Error Title — uses error_title variable -->
     <h1 class="error-title">{{ error_title }}</h1>
 
-
+    <!-- Error Message — uses error_message variable -->
     <p class="error-message">{{ error_message }}</p>
 
-
+    <!-- Contextual Tips -->
     {% if error_code == 413 %}
     <div class="error-tip">
       💡 <strong>Tip:</strong> Compress your image using a free tool like
@@ -70,11 +74,20 @@
     {% elif error_code == 404 %}
     <div class="error-tip">
       💡 <strong>Tip:</strong> The page you were looking for doesn't exist.
-      Use the navigation links above.
+      Use the navigation links above to go back.
+    </div>
+    {% elif error_code == 400 %}
+    <div class="error-tip">
+      💡 <strong>Tip:</strong> Check your input and try again.
+    </div>
+    {% elif error_code == 500 %}
+    <div class="error-tip">
+      💡 <strong>Tip:</strong> An unexpected server error occurred.
+      Please try again in a moment.
     </div>
     {% endif %}
 
-   
+    <!-- Home Button -->
     {% if show_home_button %}
     <div class="result-actions">
       <a href="{{ url_for('home') }}" class="result-btn btn-home-safe">
