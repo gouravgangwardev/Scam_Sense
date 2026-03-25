@@ -16,9 +16,11 @@ DANGER_KEYWORDS = [
     "bank account",
     "account blocked",
     "account suspended",
+    "account will be closed",
     "kyc",
     "kyc update",
     "kyc verification",
+    "kyc pending",
     "password",
     "pin number",
     "credit card",
@@ -27,6 +29,7 @@ DANGER_KEYWORDS = [
     "arrest warrant",
     "police case",
     "cyber crime",
+    "cybercrime",
     "income tax",
     "legal action",
     "court notice",
@@ -35,7 +38,11 @@ DANGER_KEYWORDS = [
     "verify your account",
     "verify immediately",
     "share your otp",
-    "do not share",          # classic "do not share OTP" phishing phrasing
+    "do not share",
+    "enter your otp",
+    "provide your details",
+    "your card will be blocked",
+    "your sim will be blocked",
 ]
 
 # Medium severity — suspicious but not always scam
@@ -48,6 +55,7 @@ SUSPICIOUS_KEYWORDS = [
     "click here",
     "click the link",
     "tap here",
+    "tap the link",
     "verify",
     "confirm your",
     "update your",
@@ -75,12 +83,20 @@ SUSPICIOUS_KEYWORDS = [
     "processing fee",
     "registration fee",
     "pay now",
+    "pay immediately",
     "transfer",
     "suspicious activity",
     "unusual activity",
     "blocked",
     "suspended",
     "deactivated",
+    "whatsapp job",
+    "earn daily",
+    "easy money",
+    "no experience needed",
+    "advance fee",
+    "customs fee",
+    "clearance fee",
 ]
 
 # Urgency amplifiers — boost score when present
@@ -91,6 +107,7 @@ URGENCY_KEYWORDS = [
     "before midnight",
     "24 hours",
     "48 hours",
+    "within 24",
     "immediately",
     "urgent",
     "asap",
@@ -99,6 +116,9 @@ URGENCY_KEYWORDS = [
     "time sensitive",
     "expires",
     "last chance",
+    "final notice",
+    "respond now",
+    "do not ignore",
 ]
 
 # Brand impersonation indicators
@@ -123,12 +143,17 @@ BRAND_KEYWORDS = [
     "microsoft",
     "apple",
     "whatsapp",
+    "trai",
+    "airtel",
+    "jio",
+    "vi",
+    "vodafone",
 ]
 
 
 # ── Scoring Logic ─────────────────────────────────────────────────────────────
 
-def basic_fallback_analysis(text: str) -> tuple[str, int]:
+def basic_fallback_analysis(text: str) -> tuple:
     """
     Analyze text using keyword rules when AI is unavailable.
 
@@ -145,19 +170,14 @@ def basic_fallback_analysis(text: str) -> tuple[str, int]:
 
     lower = text.lower()
     score = 0
-    matched = []
 
     # Danger keywords — high weight
-    for word in DANGER_KEYWORDS:
-        if word in lower:
-            score += 25
-            matched.append(word)
+    danger_hits = [word for word in DANGER_KEYWORDS if word in lower]
+    score += len(danger_hits) * 25
 
     # Suspicious keywords — medium weight
-    for word in SUSPICIOUS_KEYWORDS:
-        if word in lower:
-            score += 10
-            matched.append(word)
+    suspicious_hits = [word for word in SUSPICIOUS_KEYWORDS if word in lower]
+    score += len(suspicious_hits) * 10
 
     # Urgency amplifiers — extra weight
     urgency_count = sum(1 for word in URGENCY_KEYWORDS if word in lower)
@@ -170,7 +190,6 @@ def basic_fallback_analysis(text: str) -> tuple[str, int]:
     # Clamp score to 0–100
     score = min(score, 100)
 
-    # ── Determine Risk Level ──────────────────────────────────────────────────
     if score >= 60:
         return "DANGEROUS", score
     elif score >= 25:
@@ -179,16 +198,10 @@ def basic_fallback_analysis(text: str) -> tuple[str, int]:
         return "SAFE", score
 
 
-def get_matched_keywords(text: str) -> list[str]:
+def get_matched_keywords(text: str) -> list:
     """
     Return list of all matched scam keywords found in the text.
     Used to populate matched_patterns in the result.
-
-    Args:
-        text: Input text to scan
-
-    Returns:
-        List of matched keyword strings (deduplicated)
     """
     if not text:
         return []
@@ -202,37 +215,45 @@ def get_matched_keywords(text: str) -> list[str]:
 def full_fallback_result(text: str, source: str = "fallback") -> dict:
     """
     Full fallback analysis returning a normalized result dict.
-    Use this when you need a complete result without AI.
+    Use this when you need a complete result without AI
+    (e.g. screenshot scans, or when AI server is down).
 
     Args:
         text:   Input text to analyze
         source: Source label for the result (default: "fallback")
 
     Returns:
-        dict ready to pass to normalize_ai_response()
+        dict with keys: risk_level, risk_score, explanation, matched_patterns, color, source
     """
+    COLOR_MAP = {
+        "DANGEROUS":  "red",
+        "SUSPICIOUS": "orange",
+        "SAFE":       "green",
+    }
+
     level, score     = basic_fallback_analysis(text)
     matched_patterns = get_matched_keywords(text)
 
     if level == "DANGEROUS":
         explanation = [
-            "⚠️ High-risk scam indicators detected.",
-            "Sensitive keywords found: " + ", ".join(matched_patterns[:5]) if matched_patterns else "",
-            "Do not share personal information or make any payments.",
+            "⚠️ High-risk scam indicators detected in this content.",
+            ("Sensitive keywords found: " + ", ".join(matched_patterns[:5])) if matched_patterns else "",
+            "🚫 Do not share personal information, OTP, or make any payments.",
+            "🔐 Contact the organization directly using their official number.",
         ]
     elif level == "SUSPICIOUS":
         explanation = [
             "⚠️ Suspicious patterns detected. Verify before taking action.",
-            "Indicators found: " + ", ".join(matched_patterns[:5]) if matched_patterns else "",
-            "Contact the organization directly using their official number.",
+            ("Indicators found: " + ", ".join(matched_patterns[:5])) if matched_patterns else "",
+            "🔍 Call the organization on their official number to confirm.",
         ]
     else:
         explanation = [
-            "✅ No obvious scam patterns detected.",
-            "Always stay alert and verify before sharing personal information.",
+            "✅ No obvious scam patterns detected in this content.",
+            "💡 Always stay alert and verify before sharing personal information.",
         ]
 
-    # Remove empty strings from explanation
+    # Remove empty strings
     explanation = [e for e in explanation if e]
 
     return {
@@ -240,5 +261,6 @@ def full_fallback_result(text: str, source: str = "fallback") -> dict:
         "risk_score":       score,
         "explanation":      explanation,
         "matched_patterns": matched_patterns,
+        "color":            COLOR_MAP[level],
         "source":           source,
     }
