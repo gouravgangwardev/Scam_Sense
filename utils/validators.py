@@ -1,17 +1,12 @@
-"""
-SCAM SENSE AI — Input Validators
-Validates all user input before processing begins.
-Prevents bad data, oversized files, and unsupported formats.
-"""
 
 import os
 import re
 from urllib.parse import urlparse
 
-# ── Configuration ─────────────────────────────────────────────────────────────
-MAX_MESSAGE_LENGTH = 5000          # Maximum characters allowed in message
-MIN_MESSAGE_LENGTH = 5             # Minimum characters to be worth scanning
-MAX_FILE_SIZE_MB   = 5             # Maximum upload size in megabytes
+
+MAX_MESSAGE_LENGTH = 5000          
+MIN_MESSAGE_LENGTH = 5             
+MAX_FILE_SIZE_MB   = 5             
 MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png"}
@@ -19,7 +14,7 @@ ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png"}
 ALLOWED_URL_SCHEMES = {"http", "https"}
 
 
-# ── Message Validator ─────────────────────────────────────────────────────────
+
 def validate_message(text: str) -> tuple:
     """
     Validate pasted message text input.
@@ -45,7 +40,7 @@ def validate_message(text: str) -> tuple:
     return True, None
 
 
-# ── URL Validator ─────────────────────────────────────────────────────────────
+
 def validate_url(url: str) -> tuple:
     """
     Validate URL input before link scanning.
@@ -62,22 +57,22 @@ def validate_url(url: str) -> tuple:
 
     url = url.strip()
 
-    # Add scheme if missing so urlparse works correctly
+   
     if not url.startswith(("http://", "https://")):
         url = "https://" + url
 
     try:
         parsed = urlparse(url)
 
-        # Must have a valid scheme
+        
         if parsed.scheme not in ALLOWED_URL_SCHEMES:
             return False, "Only http and https links are supported."
 
-        # Must have a domain/netloc
+        
         if not parsed.netloc or "." not in parsed.netloc:
             return False, "This does not appear to be a valid URL. Please check and try again."
 
-        # Domain must not contain spaces
+        
         if " " in parsed.netloc:
             return False, "Invalid URL format. Please paste the complete link."
 
@@ -87,7 +82,7 @@ def validate_url(url: str) -> tuple:
     return True, None
 
 
-# ── File Validator ────────────────────────────────────────────────────────────
+
 def validate_file(filename: str, file_storage) -> tuple:
     """
     Validate uploaded screenshot file.
@@ -103,7 +98,7 @@ def validate_file(filename: str, file_storage) -> tuple:
     if not filename or filename.strip() == "":
         return False, "No file was selected. Please choose a screenshot to upload."
 
-    # Check file extension
+    
     ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
     if ext not in ALLOWED_EXTENSIONS:
         return False, (
@@ -111,11 +106,11 @@ def validate_file(filename: str, file_storage) -> tuple:
             f"Please upload a JPG or PNG image."
         )
 
-    # Check file size by reading content length
+    
     try:
-        file_storage.seek(0, os.SEEK_END)   # Move to end of file
-        file_size = file_storage.tell()      # Get position = size in bytes
-        file_storage.seek(0)                 # Reset to beginning for saving
+        file_storage.seek(0, os.SEEK_END)   
+        file_size = file_storage.tell()      
+        file_storage.seek(0)                 
 
         if file_size == 0:
             return False, "The uploaded file is empty. Please select a valid image."
@@ -134,7 +129,7 @@ def validate_file(filename: str, file_storage) -> tuple:
     return True, None
 
 
-# ── Report Content Validator ──────────────────────────────────────────────────
+
 def validate_report(content: str, report_type: str) -> tuple:
     """
     Validate user-submitted scam report form.
