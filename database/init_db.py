@@ -10,7 +10,7 @@ Usage:
 import sqlite3
 import os
 
-
+# ── Database Path ─────────────────────────────────────────────────────────────
 DB_DIR  = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(DB_DIR, "scans.db")
 
@@ -19,6 +19,7 @@ def initialize_database():
     """
     Create the SQLite database and all tables if they do not already exist.
     Safe to run multiple times — will not overwrite existing data.
+    Uses context manager for safe connection handling.
     """
     print("=" * 55)
     print("  SCAM SENSE AI — Database Initializer")
@@ -27,57 +28,53 @@ def initialize_database():
     os.makedirs(DB_DIR, exist_ok=True)
 
     try:
-        conn   = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
+        with sqlite3.connect(DB_PATH) as conn:
+            cursor = conn.cursor()
 
-        print(f"\n[DB] Connected to: {DB_PATH}")
+            print(f"\n[DB] Connected to: {DB_PATH}")
 
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS scans (
-                id              INTEGER PRIMARY KEY AUTOINCREMENT,
-                input_type      TEXT    NOT NULL,
-                risk_level      TEXT    NOT NULL,
-                risk_score      INTEGER DEFAULT 0,
-                explanation     TEXT    DEFAULT '',
-                content_preview TEXT    DEFAULT '',
-                source          TEXT    DEFAULT '',
-                timestamp       TEXT    NOT NULL
-            )
-        """)
-        print("[DB] Table 'scans'         — OK")
-        print("     Columns: id, input_type, risk_level, risk_score,")
-        print("              explanation, content_preview, source, timestamp")
+            # ── Table 1: scans ────────────────────────────────────────────────
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS scans (
+                    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                    input_type      TEXT    NOT NULL,
+                    risk_level      TEXT    NOT NULL,
+                    risk_score      INTEGER DEFAULT 0,
+                    explanation     TEXT    DEFAULT '',
+                    content_preview TEXT    DEFAULT '',
+                    source          TEXT    DEFAULT '',
+                    timestamp       TEXT    NOT NULL
+                )
+            """)
+            print("[DB] Table 'scans'         — OK")
 
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS reports (
-                id          INTEGER PRIMARY KEY AUTOINCREMENT,
-                content     TEXT    NOT NULL,
-                report_type TEXT    NOT NULL,
-                timestamp   TEXT    NOT NULL
-            )
-        """)
-        print("[DB] Table 'reports'       — OK")
+            # ── Table 2: reports ──────────────────────────────────────────────
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS reports (
+                    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                    content     TEXT    NOT NULL,
+                    report_type TEXT    NOT NULL,
+                    timestamp   TEXT    NOT NULL
+                )
+            """)
+            print("[DB] Table 'reports'       — OK")
 
-       
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS blocked_links (
-                id          INTEGER PRIMARY KEY AUTOINCREMENT,
-                url         TEXT    NOT NULL,
-                risk_score  INTEGER NOT NULL,
-                explanation TEXT    DEFAULT '',
-                timestamp   TEXT    NOT NULL
-            )
-        """)
-        print("[DB] Table 'blocked_links' — OK")
+            # ── Table 3: blocked_links ────────────────────────────────────────
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS blocked_links (
+                    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                    url         TEXT    NOT NULL,
+                    risk_score  INTEGER NOT NULL,
+                    explanation TEXT    DEFAULT '',
+                    timestamp   TEXT    NOT NULL
+                )
+            """)
+            print("[DB] Table 'blocked_links' — OK")
 
-        conn.commit()
-
-      
-        cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-        tables = [row[0] for row in cursor.fetchall()]
-        print(f"\n[DB] Tables in database : {', '.join(tables)}")
-
-        conn.close()
+            # ── Verify all tables were created ────────────────────────────────
+            cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
+            tables = [row[0] for row in cursor.fetchall()]
+            print(f"\n[DB] Tables in database : {', '.join(tables)}")
 
         print(f"\n[DB] Database ready at  : {DB_PATH}")
         print("=" * 55)
@@ -93,22 +90,12 @@ def initialize_database():
 
 
 def check_database_exists() -> bool:
-    """
-    Check if the database file already exists on disk.
-
-    Returns:
-        True if scans.db exists, False if not.
-    """
+    """Returns True if scans.db exists on disk."""
     return os.path.exists(DB_PATH)
 
 
 def get_table_counts() -> dict:
-    """
-    Get current row counts for all tables.
-
-    Returns:
-        dict — table name as key, row count as value.
-    """
+    """Returns current row counts for all tables."""
     counts = {}
 
     if not check_database_exists():
@@ -116,17 +103,14 @@ def get_table_counts() -> dict:
         return counts
 
     try:
-        conn   = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-
-        for table in ["scans", "reports", "blocked_links"]:
-            try:
-                cursor.execute(f"SELECT COUNT(*) FROM {table}")
-                counts[table] = cursor.fetchone()[0]
-            except sqlite3.OperationalError:
-                counts[table] = "TABLE NOT FOUND"
-
-        conn.close()
+        with sqlite3.connect(DB_PATH) as conn:
+            cursor = conn.cursor()
+            for table in ["scans", "reports", "blocked_links"]:
+                try:
+                    cursor.execute(f"SELECT COUNT(*) FROM {table}")
+                    counts[table] = cursor.fetchone()[0]
+                except sqlite3.OperationalError:
+                    counts[table] = "TABLE NOT FOUND"
 
     except Exception as e:
         print(f"[DB ERROR] Could not get table counts: {e}")
@@ -136,9 +120,8 @@ def get_table_counts() -> dict:
 
 def reset_database():
     """
-    Drop all tables and recreate them from scratch.
-    WARNING: This permanently deletes ALL data.
-    Only use during development or testing.
+    Drop all tables and recreate from scratch.
+    WARNING: Permanently deletes ALL data. Only use during development.
     """
     print("\n⚠️  WARNING: This will permanently delete ALL data.")
     confirm = input("    Type 'YES' to confirm reset: ")
@@ -148,14 +131,11 @@ def reset_database():
         return False
 
     try:
-        conn   = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-
-        cursor.execute("DROP TABLE IF EXISTS scans")
-        cursor.execute("DROP TABLE IF EXISTS reports")
-        cursor.execute("DROP TABLE IF EXISTS blocked_links")
-        conn.commit()
-        conn.close()
+        with sqlite3.connect(DB_PATH) as conn:
+            cursor = conn.cursor()
+            cursor.execute("DROP TABLE IF EXISTS scans")
+            cursor.execute("DROP TABLE IF EXISTS reports")
+            cursor.execute("DROP TABLE IF EXISTS blocked_links")
 
         print("[DB] All tables dropped.")
         initialize_database()
@@ -167,9 +147,8 @@ def reset_database():
         return False
 
 
-
+# ── Run directly ──────────────────────────────────────────────────────────────
 if __name__ == "__main__":
-
     initialize_database()
 
     print("\n[DB] Current row counts:")
