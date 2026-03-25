@@ -46,7 +46,15 @@ else:
     print("[OK] uploads/ folder found.")
 
 
-# ── Step 3: Initialize database ──────────────────────────────────────────────
+# ── Step 3: Check logs/ folder exists ────────────────────────────────────────
+if not os.path.exists("logs"):
+    os.makedirs("logs")
+    print("[OK] logs/ folder created.")
+else:
+    print("[OK] logs/ folder found.")
+
+
+# ── Step 4: Initialize database ──────────────────────────────────────────────
 print("\n[DB] Checking database...")
 
 try:
@@ -64,7 +72,7 @@ except Exception as e:
     sys.exit(1)
 
 
-# ── Step 4: Run safety cleanup on uploads folder ─────────────────────────────
+# ── Step 5: Run safety cleanup on uploads folder ─────────────────────────────
 print("\n[CLEANUP] Running safety cleanup on uploads folder...")
 
 try:
@@ -80,25 +88,40 @@ except Exception as e:
     print(f"[WARNING] Cleanup could not run: {e}")
 
 
-# ── Step 4.5: Check AI servers are running ────────────────────────────────────
+# ── Step 6: Check AI servers are running ─────────────────────────────────────
 print("\n[AI] Checking AI servers...")
 
 import requests as _requests
 
+message_ai_online = False
+link_ai_online    = False
+
 try:
-    _requests.get("http://localhost:5001/health", timeout=3)
-    print("[AI] message_ai server → ONLINE ✅")
+    resp = _requests.get("http://localhost:5001/health", timeout=3)
+    if resp.status_code == 200:
+        message_ai_online = True
+        print("[AI] message_ai server → ONLINE ✅")
+    else:
+        print(f"[AI] message_ai server → responded {resp.status_code} ⚠️  (fallback will be used)")
 except Exception:
     print("[AI] message_ai server → OFFLINE ⚠️  (rule-based fallback will be used)")
 
 try:
-    _requests.get("http://localhost:5002/health", timeout=3)
-    print("[AI] link_ai server    → ONLINE ✅")
+    resp = _requests.get("http://localhost:5002/health", timeout=3)
+    if resp.status_code == 200:
+        link_ai_online = True
+        print("[AI] link_ai server    → ONLINE ✅")
+    else:
+        print(f"[AI] link_ai server    → responded {resp.status_code} ⚠️  (fallback will be used)")
 except Exception:
     print("[AI] link_ai server    → OFFLINE ⚠️  (rule-based fallback will be used)")
 
+if not message_ai_online and not link_ai_online:
+    print("[AI] Both AI servers offline — running in full fallback mode.")
+    print("[AI] Screenshot scans will still work via OCR + rule-based detection.")
 
-# ── Step 5: Start Flask app ───────────────────────────────────────────────────
+
+# ── Step 7: Start Flask app ───────────────────────────────────────────────────
 print("\n[APP] Starting Flask server...")
 print("=" * 55)
 
@@ -109,11 +132,12 @@ try:
     port  = int(os.getenv("PORT", 8080))
     debug = os.getenv("DEBUG", "True").lower() == "true"
 
-    print(f"[APP] Mode       : {'Development' if debug else 'Production'}")
-    print(f"[APP] Port       : {port}")
-    print(f"[APP] URL        : http://localhost:{port}")
-    print(f"[APP] Message AI : http://localhost:5001")
-    print(f"[APP] Link AI    : http://localhost:5002")
+    print(f"[APP] Mode         : {'Development' if debug else 'Production'}")
+    print(f"[APP] Port         : {port}")
+    print(f"[APP] URL          : http://localhost:{port}")
+    print(f"[APP] Message AI   : http://localhost:5001  ({'ONLINE' if message_ai_online else 'OFFLINE — fallback'})")
+    print(f"[APP] Link AI      : http://localhost:5002  ({'ONLINE' if link_ai_online else 'OFFLINE — fallback'})")
+    print(f"[APP] Screenshot   : OCR + rule-based (AI disabled for images)")
     print("=" * 55)
     print()
 
