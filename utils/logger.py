@@ -1,10 +1,3 @@
-"""
-SCAM SENSE AI — Scan Logger
-Records every scan with FULL AI assessment result into the SQLite database.
-Stores: input type, risk level, risk score, AI explanation,
-        content preview, detection source, and timestamp.
-"""
-
 import sqlite3
 import os
 from datetime import datetime
@@ -12,9 +5,6 @@ from datetime import datetime
 DB_PATH = os.path.join("database", "scans.db")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# LOG SCAN — Saves full AI result after every scan
-# ══════════════════════════════════════════════════════════════════════════════
 
 def log_scan(
     input_type      : str,
@@ -54,7 +44,7 @@ def log_scan(
                 risk_level,
                 int(risk_score),
                 explanation.strip(),
-                content_preview[:300],          # Never store more than 300 chars
+                content_preview[:300],          
                 source,
                 datetime.now().isoformat(),
             ),
@@ -82,9 +72,6 @@ def log_scan(
         return False
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# LOG REPORT — Saves user submitted scam report
-# ══════════════════════════════════════════════════════════════════════════════
 
 def log_report(content: str, report_type: str) -> bool:
     """
@@ -120,9 +107,7 @@ def log_report(content: str, report_type: str) -> bool:
         return False
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# GET SCAN SUMMARY — Risk level counts for stats page
-# ══════════════════════════════════════════════════════════════════════════════
+
 
 def get_scan_summary() -> dict:
     """
@@ -161,9 +146,7 @@ def get_scan_summary() -> dict:
     return summary
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# GET RECENT SCANS — Full scan records for stats table
-# ══════════════════════════════════════════════════════════════════════════════
+
 
 def get_recent_scans(limit: int = 50) -> list:
     """
