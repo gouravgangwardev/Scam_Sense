@@ -13,7 +13,7 @@ from werkzeug.utils import secure_filename
 
 # ── Internal Imports ──────────────────────────────────────────────────────────
 import config
-from utils.ai_client       import analyze_with_ai
+from utils.ai_client       import analyze_with_ai, rule_based_link
 from utils.ocr_handler     import extract_text_from_image
 from utils.link_checker    import check_link
 from utils.logger          import log_scan, log_report, get_scan_summary, get_recent_scans
@@ -196,7 +196,6 @@ def scan_link():
             )
         except Exception as e:
             print(f"[APP] AI failed for link scan: {e}. Using fallback.")
-            from utils.ai_client import rule_based_link
             result = rule_based_link(url)
 
     # Step 6: If DANGEROUS — save to blocked_links table
