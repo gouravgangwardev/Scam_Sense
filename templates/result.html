@@ -8,21 +8,18 @@
 
 <div class="result-page result-{{ result.risk_level | lower }}">
 
-
   <div class="result-bg-fx"></div>
 
   <div class="result-container">
 
-
+    <!-- ════════════════════════════════ DANGEROUS ═══════════════════════════ -->
     {% if result.risk_level == "DANGEROUS" %}
 
     <div class="result-icon-wrap danger-pulse">
       <div class="result-icon">⛔</div>
     </div>
 
-    <div class="result-badge badge-danger">
-      ● THREAT DETECTED
-    </div>
+    <div class="result-badge badge-danger">● THREAT DETECTED</div>
 
     <h1 class="result-title danger-text">
       DANGER<br>
@@ -30,11 +27,11 @@
     </h1>
 
     <p class="result-desc">
-      Our AI has identified this as a <strong>high-risk scam attempt</strong>.
+      Our system has identified this as a <strong>high-risk scam attempt</strong>.
       Do not click any links, make any payments, or share any personal information.
     </p>
 
-
+    <!-- Risk Meter -->
     <div class="risk-meter">
       <div class="meter-label">
         <span>RISK LEVEL</span>
@@ -45,16 +42,24 @@
       </div>
     </div>
 
-
+    <!-- AI / Analysis Explanation -->
     <div class="result-explain danger-explain">
       <div class="explain-header">
-        <span class="explain-icon">🤖</span>
-        AI ANALYSIS
+        <span class="explain-icon">🔍</span>
+        ANALYSIS
       </div>
-      <p class="explain-text">{{ result.explanation }}</p>
+      <div class="explain-text">
+        {% if result.explanation is iterable and result.explanation is not string %}
+          {% for line in result.explanation %}
+            {% if line %}<p>{{ line }}</p>{% endif %}
+          {% endfor %}
+        {% else %}
+          <p>{{ result.explanation }}</p>
+        {% endif %}
+      </div>
     </div>
 
-
+    <!-- Content Preview -->
     {% if preview %}
     <div class="result-preview danger-preview">
       <div class="preview-label">⚠ SCANNED CONTENT (DO NOT ACT ON THIS)</div>
@@ -62,7 +67,7 @@
     </div>
     {% endif %}
 
-
+    <!-- Matched Patterns -->
     {% if result.matched_patterns %}
     <div class="matched-patterns">
       <div class="patterns-label">SCAM INDICATORS FOUND:</div>
@@ -74,26 +79,20 @@
     </div>
     {% endif %}
 
-
     <div class="result-actions">
-      <a href="{{ url_for('home') }}" class="result-btn btn-home-danger">
-        ← BACK TO SAFETY
-      </a>
-      <a href="{{ url_for('report_scam') }}" class="result-btn btn-report-danger">
-        📢 REPORT THIS SCAM
-      </a>
+      <a href="{{ url_for('home') }}" class="result-btn btn-home-danger">← BACK TO SAFETY</a>
+      <a href="{{ url_for('report_scam') }}" class="result-btn btn-report-danger">📢 REPORT THIS SCAM</a>
     </div>
 
 
+    <!-- ════════════════════════════════ SUSPICIOUS ══════════════════════════ -->
     {% elif result.risk_level == "SUSPICIOUS" %}
 
     <div class="result-icon-wrap warn-pulse">
       <div class="result-icon">⚠️</div>
     </div>
 
-    <div class="result-badge badge-suspicious">
-      ● SUSPICIOUS CONTENT
-    </div>
+    <div class="result-badge badge-suspicious">● SUSPICIOUS CONTENT</div>
 
     <h1 class="result-title suspicious-text">
       BE CAREFUL<br>
@@ -102,11 +101,10 @@
 
     <p class="result-desc">
       This content shows <strong>suspicious patterns</strong>.
-      It may or may not be a scam — but you should verify the source
-      before clicking any links or making payments.
+      It may or may not be a scam — verify the source before clicking links or making payments.
     </p>
 
-
+    <!-- Risk Meter -->
     <div class="risk-meter">
       <div class="meter-label">
         <span>RISK LEVEL</span>
@@ -117,15 +115,24 @@
       </div>
     </div>
 
-
+    <!-- Analysis Explanation -->
     <div class="result-explain suspicious-explain">
       <div class="explain-header">
-        <span class="explain-icon">🤖</span>
-        AI ANALYSIS
+        <span class="explain-icon">🔍</span>
+        ANALYSIS
       </div>
-      <p class="explain-text">{{ result.explanation }}</p>
+      <div class="explain-text">
+        {% if result.explanation is iterable and result.explanation is not string %}
+          {% for line in result.explanation %}
+            {% if line %}<p>{{ line }}</p>{% endif %}
+          {% endfor %}
+        {% else %}
+          <p>{{ result.explanation }}</p>
+        {% endif %}
+      </div>
     </div>
 
+    <!-- Content Preview -->
     {% if preview %}
     <div class="result-preview suspicious-preview">
       <div class="preview-label">SCANNED CONTENT</div>
@@ -133,6 +140,7 @@
     </div>
     {% endif %}
 
+    <!-- Matched Patterns -->
     {% if result.matched_patterns %}
     <div class="matched-patterns">
       <div class="patterns-label">SUSPICIOUS INDICATORS:</div>
@@ -155,24 +163,19 @@
     </div>
 
     <div class="result-actions">
-      <a href="{{ url_for('home') }}" class="result-btn btn-home-suspicious">
-        ← SCAN ANOTHER
-      </a>
-      <a href="{{ url_for('report_scam') }}" class="result-btn btn-report-suspicious">
-        📢 REPORT THIS
-      </a>
+      <a href="{{ url_for('home') }}" class="result-btn btn-home-suspicious">← SCAN ANOTHER</a>
+      <a href="{{ url_for('report_scam') }}" class="result-btn btn-report-suspicious">📢 REPORT THIS</a>
     </div>
 
 
+    <!-- ════════════════════════════════ SAFE ════════════════════════════════ -->
     {% else %}
 
     <div class="result-icon-wrap safe-pulse">
       <div class="result-icon">✅</div>
     </div>
 
-    <div class="result-badge badge-safe">
-      ● NO THREATS FOUND
-    </div>
+    <div class="result-badge badge-safe">● NO THREATS FOUND</div>
 
     <h1 class="result-title safe-text">
       LOOKS SAFE<br>
@@ -180,28 +183,36 @@
     </h1>
 
     <p class="result-desc">
-      Our AI found <strong>no obvious scam patterns</strong> in this content.
+      No obvious scam patterns were found in this content.
       However, always stay alert and use your own judgment before sharing personal information.
     </p>
 
-
+    <!-- Risk Meter -->
     <div class="risk-meter">
       <div class="meter-label">
         <span>RISK LEVEL</span>
         <span class="meter-score safe-text">{{ result.risk_score }}%</span>
       </div>
       <div class="meter-track">
-        <div class="meter-fill safe-fill" style="width: {{ result.risk_score if result.risk_score > 0 else 5 }}%"></div>
+        <div class="meter-fill safe-fill" style="width: {{ [result.risk_score, 5] | max }}%"></div>
       </div>
     </div>
 
-
+    <!-- Analysis Explanation -->
     <div class="result-explain safe-explain">
       <div class="explain-header">
-        <span class="explain-icon">🤖</span>
-        AI ANALYSIS
+        <span class="explain-icon">🔍</span>
+        ANALYSIS
       </div>
-      <p class="explain-text">{{ result.explanation }}</p>
+      <div class="explain-text">
+        {% if result.explanation is iterable and result.explanation is not string %}
+          {% for line in result.explanation %}
+            {% if line %}<p>{{ line }}</p>{% endif %}
+          {% endfor %}
+        {% else %}
+          <p>{{ result.explanation }}</p>
+        {% endif %}
+      </div>
     </div>
 
     <div class="safe-reminder">
@@ -210,16 +221,23 @@
     </div>
 
     <div class="result-actions">
-      <a href="{{ url_for('home') }}" class="result-btn btn-home-safe">
-        ← SCAN ANOTHER
-      </a>
+      <a href="{{ url_for('home') }}" class="result-btn btn-home-safe">← SCAN ANOTHER</a>
     </div>
 
     {% endif %}
 
-
+    <!-- ── Detection Source Label ───────────────────────────────────────── -->
     <div class="detection-source">
-      Analyzed by: <span class="source-tag">{{ result.source | upper }}</span>
+      Analyzed by:
+      <span class="source-tag">
+        {% if result.source == "ocr_fallback" %}OCR + RULE-BASED
+        {% elif result.source == "fallback" %}RULE-BASED FALLBACK
+        {% elif result.source == "whitelist" %}SAFE WHITELIST
+        {% elif result.source == "message-ai" %}MESSAGE AI
+        {% elif result.source == "link-ai" %}LINK AI
+        {% else %}{{ result.source | upper }}
+        {% endif %}
+      </span>
     </div>
 
   </div>
