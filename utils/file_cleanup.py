@@ -1,15 +1,9 @@
-"""
-SCAM SENSE AI — File Cleanup
-Deletes uploaded screenshot files immediately after OCR is complete.
-Also provides a safety cleanup for files older than 60 minutes.
-"""
-
 import os
 import time
 from datetime import datetime
 
 
-# ── Delete Single File After Scan ─────────────────────────────────────────────
+
 def delete_file(filepath: str) -> bool:
     """
     Delete a single uploaded file after OCR extraction is done.
@@ -27,7 +21,7 @@ def delete_file(filepath: str) -> bool:
 
         if not os.path.exists(filepath):
             print(f"[CLEANUP] File not found (already deleted?): {filepath}")
-            return True  # Not an error — file is already gone
+            return True  
 
         os.remove(filepath)
         print(f"[CLEANUP] Deleted file: {filepath}")
@@ -42,7 +36,7 @@ def delete_file(filepath: str) -> bool:
         return False
 
 
-# ── Safety Cleanup: Delete Old Files ─────────────────────────────────────────
+
 def cleanup_old_files(folder: str, max_age_minutes: int = 60) -> int:
     """
     Delete all files in the uploads folder older than max_age_minutes.
@@ -65,18 +59,18 @@ def cleanup_old_files(folder: str, max_age_minutes: int = 60) -> int:
 
     try:
         for filename in os.listdir(folder):
-            # Skip hidden files like .gitkeep
+            
             if filename.startswith("."):
                 continue
 
             filepath = os.path.join(folder, filename)
 
-            # Only process files, not subdirectories
+            
             if not os.path.isfile(filepath):
                 continue
 
             try:
-                # Get file's last modification time
+                
                 file_age_seconds = now - os.path.getmtime(filepath)
 
                 if file_age_seconds > max_age_seconds:
@@ -99,7 +93,7 @@ def cleanup_old_files(folder: str, max_age_minutes: int = 60) -> int:
     return deleted_count
 
 
-# ── Clear Entire Uploads Folder ───────────────────────────────────────────────
+
 def clear_uploads_folder(folder: str) -> int:
     """
     Delete ALL files in the uploads folder.
