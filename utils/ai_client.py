@@ -1,62 +1,54 @@
-"""
-SCAM SENSE AI — AI Client
-Connects to:
-  - message_ai server (port 5001) for text/message/screenshot scans
-  - link_ai server    (port 5002) for URL scans
-Falls back to rule-based detection if any AI server is offline.
-"""
-
 import requests
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# ── AI Engine URLs from .env ────────────────────────────────────────────────
+
 MESSAGE_AI_URL = os.getenv("MESSAGE_AI_URL", "http://localhost:5001/predict")
 LINK_AI_URL    = os.getenv("LINK_AI_URL",    "http://localhost:5002/predict/url")
 
-# ── Risk Level Color Mapping ─────────────────────────────────────────────────
+
 COLOR_MAP = {
     "DANGEROUS": "red",
     "SUSPICIOUS": "orange",
     "SAFE":      "green",
 }
 
-# ── Scam Keywords for Rule-Based Fallback ───────────────────────────────────
+
 SCAM_KEYWORDS = [
-    # Urgency / Pressure
+    
     "urgent", "act now", "immediately", "last chance", "expire today",
     "limited time", "respond within 24 hours", "do not ignore",
 
-    # Financial Fraud
+   
     "send money", "transfer funds", "wire transfer", "pay now",
     "advance fee", "processing fee", "customs fee", "clearance fee",
     "kyc update", "kyc verification", "account blocked", "account suspended",
     "bank account update", "refund pending", "income tax refund",
 
-    # Credential / OTP Theft
+    
     "otp", "one time password", "share your otp", "enter your pin",
     "verify your identity", "confirm your details", "update your password",
     "click here to verify", "login to confirm",
 
-    # Prize / Lottery Scam
+    
     "you have won", "congratulations", "winner", "lottery",
     "claim your prize", "selected for reward", "free gift",
     "lucky winner", "you are selected",
 
-    # Job Scam
+    
     "work from home", "part time earning", "whatsapp job",
     "earn daily", "easy money", "no experience needed",
     "salary credited", "job offer", "online earning",
 
-    # Impersonation
+    
     "rbi", "police case", "arrest warrant", "court notice",
     "income tax department", "customs department", "cyber crime",
     "your account will be closed", "legal action",
 ]
 
-# ── URL Risk Keywords for Link Fallback ─────────────────────────────────────
+
 PHISHING_URL_KEYWORDS = [
     "verify", "secure", "login", "update", "confirm",
     "account", "banking", "otp", "password", "kyc",
@@ -67,9 +59,6 @@ SUSPICIOUS_DOMAINS = [".xyz", ".tk", ".ml", ".cf", ".gq", ".top", ".click"]
 URL_SHORTENERS     = ["bit.ly", "tinyurl", "t.co", "goo.gl", "ow.ly", "short.ly"]
 
 
-# ════════════════════════════════════════════════════════════════════════════
-# RULE-BASED FALLBACKS
-# ════════════════════════════════════════════════════════════════════════════
 
 def rule_based_message(content: str) -> dict:
     """
@@ -121,19 +110,16 @@ def rule_based_link(url: str) -> dict:
     score      = 0.0
     explanation = []
 
-    # Check raw IP address
     if re.match(r'https?://\d+\.\d+\.\d+\.\d+', url):
         matched.append("raw IP address")
         explanation.append("🚨 URL uses a raw IP address instead of a domain name")
         score += 0.4
 
-    # Check no HTTPS
     if url_lower.startswith("http://"):
         matched.append("no HTTPS")
         explanation.append("🔓 Connection is not secure — no HTTPS")
         score += 0.2
 
-    # Check suspicious domain endings
     for domain in SUSPICIOUS_DOMAINS:
         if domain in url_lower:
             matched.append(f"suspicious domain: {domain}")
@@ -141,7 +127,6 @@ def rule_based_link(url: str) -> dict:
             score += 0.3
             break
 
-    # Check URL shorteners
     for shortener in URL_SHORTENERS:
         if shortener in url_lower:
             matched.append(f"URL shortener: {shortener}")
@@ -149,20 +134,17 @@ def rule_based_link(url: str) -> dict:
             score += 0.25
             break
 
-    # Check phishing keywords in URL
     kw_found = [kw for kw in PHISHING_URL_KEYWORDS if kw in url_lower]
     if kw_found:
         matched.extend(kw_found)
         explanation.append(f"⚠️ Sensitive keywords in URL: {', '.join(kw_found[:4])}")
         score += len(kw_found) * 0.08
 
-    # Check unusually long URL
     if len(url) > 75:
         matched.append("long URL")
         explanation.append("📏 URL is unusually long — common in phishing")
         score += 0.1
 
-    # Check @ symbol
     if "@" in url:
         matched.append("@ symbol")
         explanation.append("🚩 @ symbol in URL is a phishing indicator")
@@ -188,9 +170,7 @@ def rule_based_link(url: str) -> dict:
     }
 
 
-# ════════════════════════════════════════════════════════════════════════════
-# AI SERVER CALLERS
-# ════════════════════════════════════════════════════════════════════════════
+
 
 def call_message_ai(content: str, guardian: bool = False, lang: str = "en") -> dict:
     """
@@ -275,9 +255,6 @@ def call_link_ai(url: str, lang: str = "en") -> dict:
         return rule_based_link(url)
 
 
-# ════════════════════════════════════════════════════════════════════════════
-# MAIN FUNCTION — called by app.py
-# ════════════════════════════════════════════════════════════════════════════
 
 def analyze_with_ai(
     input_type: str,
@@ -306,7 +283,7 @@ def analyze_with_ai(
             source           → which engine produced the result
     """
 
-    # Guard: empty content
+
     if not content or not content.strip():
         return {
             "risk_level":       "SAFE",
@@ -317,7 +294,7 @@ def analyze_with_ai(
             "source":           "empty-input",
         }
 
-    # Route to correct AI server based on input type
+
     if input_type == "link":
         return call_link_ai(url=content, lang=lang)
 
@@ -325,6 +302,6 @@ def analyze_with_ai(
         return call_message_ai(content=content, guardian=guardian, lang=lang)
 
     else:
-        # Unknown input type — use message fallback
+        
         print(f"[AI CLIENT] Unknown input_type '{input_type}'. Defaulting to message scan.")
         return call_message_ai(content=content, guardian=guardian, lang=lang)
