@@ -1,25 +1,7 @@
-"""
-SCAM SENSE AI — Error Handlers
-Catches all Flask errors and shows user-friendly pages.
-Never lets the app crash with a raw Python error.
-
-Handles:
-    400 — Bad Request        (invalid input submitted)
-    404 — Page Not Found     (wrong URL visited)
-    405 — Method Not Allowed (wrong HTTP method used)
-    413 — File Too Large     (uploaded file exceeds 5MB)
-    429 — Too Many Requests  (rate limit exceeded)
-    500 — Internal Error     (unexpected server crash)
-    OCR Failure              (image text extraction failed)
-    AI Connection Failure    (AI engine offline or timed out)
-"""
-
 from flask import render_template, jsonify, request
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# REGISTER FUNCTION — Called once in app.py
-# ══════════════════════════════════════════════════════════════════════════════
+
 
 def register_error_handlers(app):
     """
@@ -31,7 +13,7 @@ def register_error_handlers(app):
         register_error_handlers(app)
     """
 
-    # ── 400 Bad Request ───────────────────────────────────────────────────────
+    
     @app.errorhandler(400)
     def bad_request(error):
         """
@@ -50,7 +32,7 @@ def register_error_handlers(app):
         ), 400
 
 
-    # ── 404 Not Found ─────────────────────────────────────────────────────────
+   
     @app.errorhandler(404)
     def page_not_found(error):
         """
@@ -69,7 +51,7 @@ def register_error_handlers(app):
         ), 404
 
 
-    # ── 405 Method Not Allowed ────────────────────────────────────────────────
+    
     @app.errorhandler(405)
     def method_not_allowed(error):
         """
@@ -88,7 +70,7 @@ def register_error_handlers(app):
         ), 405
 
 
-    # ── 413 Request Entity Too Large ──────────────────────────────────────────
+    
     @app.errorhandler(413)
     def file_too_large(error):
         """
@@ -108,7 +90,7 @@ def register_error_handlers(app):
         ), 413
 
 
-    # ── 429 Too Many Requests ─────────────────────────────────────────────────
+    
     @app.errorhandler(429)
     def rate_limit_exceeded(error):
         """
@@ -127,7 +109,7 @@ def register_error_handlers(app):
         ), 429
 
 
-    # ── 500 Internal Server Error ─────────────────────────────────────────────
+   
     @app.errorhandler(500)
     def internal_server_error(error):
         """
@@ -151,9 +133,7 @@ def register_error_handlers(app):
     print("[ERROR HANDLERS] All error handlers registered successfully.")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# HELPER FUNCTIONS — Used inside routes for specific failure types
-# ══════════════════════════════════════════════════════════════════════════════
+
 
 def ocr_failure_response():
     """
