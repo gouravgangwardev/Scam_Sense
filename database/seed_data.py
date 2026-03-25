@@ -11,20 +11,15 @@ import sqlite3
 import os
 from datetime import datetime, timedelta
 
-# ── Database Path ─────────────────────────────────────────────────────────────
+
 DB_DIR  = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(DB_DIR, "scans.db")
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# SAMPLE SCAN DATA
-# Format: (input_type, risk_level, risk_score, explanation, content_preview, source)
-# ══════════════════════════════════════════════════════════════════════════════
 
 SAMPLE_SCANS = [
 
-    # ── DANGEROUS — Bank Impersonation ────────────────────────────────────────
-    (
+        (
         "message", "DANGEROUS", 94,
         "This message impersonates SBI bank and requests the user to share "
         "their OTP immediately. Real banks never ask for OTP over SMS or call. "
@@ -34,7 +29,7 @@ SAMPLE_SCANS = [
         "ai-engine"
     ),
 
-    # ── DANGEROUS — Phishing Link ─────────────────────────────────────────────
+    
     (
         "link", "DANGEROUS", 91,
         "This URL impersonates the HDFC Bank login page on a suspicious .xyz domain. "
@@ -44,7 +39,7 @@ SAMPLE_SCANS = [
         "ai-engine"
     ),
 
-    # ── DANGEROUS — Lottery Scam Screenshot ──────────────────────────────────
+   
     (
         "screenshot", "DANGEROUS", 96,
         "Screenshot contains a fake lottery winning notice. "
@@ -55,7 +50,7 @@ SAMPLE_SCANS = [
         "ai-engine"
     ),
 
-    # ── DANGEROUS — Income Tax Impersonation ─────────────────────────────────
+    
     (
         "message", "DANGEROUS", 89,
         "This message impersonates the Income Tax Department of India and "
@@ -66,7 +61,7 @@ SAMPLE_SCANS = [
         "ai-engine"
     ),
 
-    # ── DANGEROUS — Raw IP Phishing URL ──────────────────────────────────────
+   
     (
         "link", "DANGEROUS", 87,
         "This URL uses a raw IP address as the domain which is a strong "
@@ -76,7 +71,7 @@ SAMPLE_SCANS = [
         "ai-engine"
     ),
 
-    # ── DANGEROUS — Fake Police Threat ───────────────────────────────────────
+    
     (
         "message", "DANGEROUS", 93,
         "Message impersonates cybercrime police and threatens legal action "
@@ -87,7 +82,7 @@ SAMPLE_SCANS = [
         "ai-engine"
     ),
 
-    # ── SUSPICIOUS — Fake Job Offer ───────────────────────────────────────────
+    
     (
         "message", "SUSPICIOUS", 52,
         "Message contains work-from-home job offer with unrealistic daily earnings. "
@@ -98,7 +93,7 @@ SAMPLE_SCANS = [
         "ai-engine"
     ),
 
-    # ── SUSPICIOUS — Fake Government Scheme ───────────────────────────────────
+    
     (
         "screenshot", "SUSPICIOUS", 48,
         "Screenshot contains an unverified government scheme offering free cash. "
@@ -109,7 +104,7 @@ SAMPLE_SCANS = [
         "rule-based-fallback"
     ),
 
-    # ── SUSPICIOUS — Too Good To Be True Offer ────────────────────────────────
+    
     (
         "link", "SUSPICIOUS", 44,
         "URL leads to a page offering unrealistic discounts on branded products. "
@@ -119,7 +114,7 @@ SAMPLE_SCANS = [
         "ai-engine"
     ),
 
-    # ── SUSPICIOUS — Advance Fee Fraud ───────────────────────────────────────
+    
     (
         "message", "SUSPICIOUS", 55,
         "Message contains advance fee fraud indicators. "
@@ -130,7 +125,7 @@ SAMPLE_SCANS = [
         "ai-engine"
     ),
 
-    # ── SAFE — Delivery Notification ─────────────────────────────────────────
+    
     (
         "message", "SAFE", 4,
         "No scam indicators detected. Message appears to be a standard "
@@ -141,7 +136,7 @@ SAMPLE_SCANS = [
         "ai-engine"
     ),
 
-    # ── SAFE — Bank Transaction Alert ────────────────────────────────────────
+    
     (
         "message", "SAFE", 3,
         "Standard bank transaction SMS. Contains masked account details "
@@ -152,7 +147,7 @@ SAMPLE_SCANS = [
         "ai-engine"
     ),
 
-    # ── SAFE — Official Website URL ───────────────────────────────────────────
+   
     (
         "link", "SAFE", 2,
         "Domain is on the verified safe whitelist. "
@@ -173,7 +168,7 @@ SAMPLE_SCANS = [
         "ai-engine"
     ),
 
-    # ── SAFE — Screenshot of Normal Message ──────────────────────────────────
+    
     (
         "screenshot", "SAFE", 5,
         "Screenshot contains a normal appointment reminder message. "
@@ -185,9 +180,6 @@ SAMPLE_SCANS = [
 ]
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# SAMPLE REPORTS DATA
-# ══════════════════════════════════════════════════════════════════════════════
 
 SAMPLE_REPORTS = [
     (
@@ -210,9 +202,6 @@ SAMPLE_REPORTS = [
 ]
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# SEED FUNCTION
-# ══════════════════════════════════════════════════════════════════════════════
 
 def seed_database():
     """
@@ -233,7 +222,7 @@ def seed_database():
         conn   = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
 
-        # ── Check if already seeded ───────────────────────────────────────────
+        
         cursor.execute("SELECT COUNT(*) FROM scans")
         existing_count = cursor.fetchone()[0]
 
@@ -245,12 +234,11 @@ def seed_database():
                 conn.close()
                 return False
 
-        # ── Insert sample scans ───────────────────────────────────────────────
+        
         print("\n[SEED] Inserting sample scan records...")
 
         for i, scan in enumerate(SAMPLE_SCANS):
-            # Space timestamps 25 minutes apart going backwards
-            # So records look like they happened over the past few hours
+            
             timestamp = (
                 datetime.now() - timedelta(minutes=25 * i)
             ).isoformat()
@@ -267,7 +255,7 @@ def seed_database():
 
         print(f"[SEED] {len(SAMPLE_SCANS)} scan records inserted.")
 
-        # ── Insert sample reports ─────────────────────────────────────────────
+        
         print("[SEED] Inserting sample report records...")
 
         for i, report in enumerate(SAMPLE_REPORTS):
@@ -288,7 +276,7 @@ def seed_database():
         conn.commit()
         conn.close()
 
-        # ── Summary ───────────────────────────────────────────────────────────
+        
         dangerous  = sum(1 for s in SAMPLE_SCANS if s[1] == "DANGEROUS")
         suspicious = sum(1 for s in SAMPLE_SCANS if s[1] == "SUSPICIOUS")
         safe       = sum(1 for s in SAMPLE_SCANS if s[1] == "SAFE")
