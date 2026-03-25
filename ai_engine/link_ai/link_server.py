@@ -8,7 +8,6 @@ import urllib.parse
 app = Flask(__name__)
 CORS(app)
 
-# Load model, scaler, features
 model = pickle.load(open('link_model.pkl', 'rb'))
 scaler = pickle.load(open('link_scaler.pkl', 'rb'))
 feature_names = pickle.load(open('link_features.pkl', 'rb'))
@@ -86,17 +85,12 @@ def extract_features(url):
             "PctExtNullSelfRedirectHyperlinksRT": 0,
         }
 
-        # Build feature vector in correct order
+
         feature_vector = [features.get(f, 0) for f in feature_names]
         return feature_vector, features
 
     except Exception as e:
         return None, str(e)
-
-
-# ─────────────────────────────────────────
-# Risk Level Builder
-# ─────────────────────────────────────────
 
 def build_explanation(features, risk, score, lang='en'):
     explanation = []
@@ -187,10 +181,6 @@ def build_explanation(features, risk, score, lang='en'):
     return explanation
 
 
-# ─────────────────────────────────────────
-# Routes
-# ─────────────────────────────────────────
-
 @app.route('/health', methods=['GET'])
 def health():
     return jsonify({"status": "link_ai running", "port": 5002})
@@ -209,23 +199,22 @@ def predict_url():
     if lang not in ['en', 'hi', 'es']:
         lang = 'en'
 
-    # Basic validation
+
     if not url.startswith(('http://', 'https://')):
         url = 'http://' + url
 
-    # Extract features
+
     feature_vector, features = extract_features(url)
 
     if feature_vector is None:
         return jsonify({"error": f"Could not parse URL: {features}"}), 400
 
-    # AI prediction
     scaled = scaler.transform([feature_vector])
     prediction = model.predict(scaled)[0]
     proba = model.predict_proba(scaled)[0][1]
     score = round(float(proba), 2)
 
-    # Determine risk level
+
     if prediction == 1:
         if score >= 0.80:
             risk = "DANGEROUS"
@@ -237,7 +226,7 @@ def predict_url():
         else:
             risk = "SAFE"
 
-    # Build explanation
+
     explanation = build_explanation(features, risk, score, lang)
 
     return jsonify({
