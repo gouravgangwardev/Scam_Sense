@@ -1,26 +1,29 @@
+"""
+SCAM SENSE AI — Input Validators
+Validates all user input before processing begins.
+Prevents bad data, oversized files, and unsupported formats.
+"""
 
 import os
 import re
+import imghdr
 from urllib.parse import urlparse
 
-
-MAX_MESSAGE_LENGTH = 5000          
-MIN_MESSAGE_LENGTH = 5             
-MAX_FILE_SIZE_MB   = 5             
+# ── Configuration ─────────────────────────────────────────────────────────────
+MAX_MESSAGE_LENGTH  = 5000
+MIN_MESSAGE_LENGTH  = 5
+MAX_FILE_SIZE_MB    = 5
 MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 
 ALLOWED_EXTENSIONS = {"jpg", "jpeg", "png"}
-
+ALLOWED_MIME_TYPES = {"jpeg", "png"}        # imghdr returns these strings
 ALLOWED_URL_SCHEMES = {"http", "https"}
 
 
-
+# ── Message Validator ─────────────────────────────────────────────────────────
 def validate_message(text: str) -> tuple:
     """
     Validate pasted message text input.
-
-    Args:
-        text: The message text submitted by user
 
     Returns:
         (True, None)           if valid
@@ -40,13 +43,10 @@ def validate_message(text: str) -> tuple:
     return True, None
 
 
-
+# ── URL Validator ─────────────────────────────────────────────────────────────
 def validate_url(url: str) -> tuple:
     """
     Validate URL input before link scanning.
-
-    Args:
-        url: The URL string submitted by user
 
     Returns:
         (True, None)           if valid
@@ -57,22 +57,19 @@ def validate_url(url: str) -> tuple:
 
     url = url.strip()
 
-   
+    # Add scheme if missing so urlparse works correctly
     if not url.startswith(("http://", "https://")):
         url = "https://" + url
 
     try:
         parsed = urlparse(url)
 
-        
         if parsed.scheme not in ALLOWED_URL_SCHEMES:
             return False, "Only http and https links are supported."
 
-        
         if not parsed.netloc or "." not in parsed.netloc:
             return False, "This does not appear to be a valid URL. Please check and try again."
 
-        
         if " " in parsed.netloc:
             return False, "Invalid URL format. Please paste the complete link."
 
@@ -82,10 +79,11 @@ def validate_url(url: str) -> tuple:
     return True, None
 
 
-
+# ── File Validator ────────────────────────────────────────────────────────────
 def validate_file(filename: str, file_storage) -> tuple:
     """
     Validate uploaded screenshot file.
+    Checks extension, file size, AND actual MIME type (prevents spoofed extensions).
 
     Args:
         filename    : Original filename from the upload
@@ -98,19 +96,19 @@ def validate_file(filename: str, file_storage) -> tuple:
     if not filename or filename.strip() == "":
         return False, "No file was selected. Please choose a screenshot to upload."
 
-    
+    # Check file extension
     ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else ""
     if ext not in ALLOWED_EXTENSIONS:
         return False, (
             f"File type '.{ext}' is not supported. "
-            f"Please upload a JPG or PNG image."
+            "Please upload a JPG or PNG image."
         )
 
-    
+    # Check file size
     try:
-        file_storage.seek(0, os.SEEK_END)   
-        file_size = file_storage.tell()      
-        file_storage.seek(0)                 
+        file_storage.seek(0, os.SEEK_END)
+        file_size = file_storage.tell()
+        file_storage.seek(0)
 
         if file_size == 0:
             return False, "The uploaded file is empty. Please select a valid image."
@@ -126,17 +124,30 @@ def validate_file(filename: str, file_storage) -> tuple:
         print(f"[VALIDATOR ERROR] File size check failed: {e}")
         return False, "Could not read the uploaded file. Please try again."
 
+    # Check actual MIME type using imghdr (prevents renaming exe to .png)
+    try:
+        file_storage.seek(0)
+        detected_type = imghdr.what(file_storage)
+        file_storage.seek(0)
+
+        if detected_type not in ALLOWED_MIME_TYPES:
+            return False, (
+                "The uploaded file does not appear to be a valid image. "
+                "Please upload a real JPG or PNG screenshot."
+            )
+
+    except Exception as e:
+        print(f"[VALIDATOR ERROR] MIME type check failed: {e}")
+        # If imghdr fails, allow through — extension check already passed
+        file_storage.seek(0)
+
     return True, None
 
 
-
+# ── Report Content Validator ──────────────────────────────────────────────────
 def validate_report(content: str, report_type: str) -> tuple:
     """
     Validate user-submitted scam report form.
-
-    Args:
-        content     : Scam content submitted by user
-        report_type : Category selected by user
 
     Returns:
         (True, None)           if valid
@@ -157,4 +168,3 @@ def validate_report(content: str, report_type: str) -> tuple:
         return False, "Invalid report type selected. Please choose a valid category."
 
     return True, None
-    
