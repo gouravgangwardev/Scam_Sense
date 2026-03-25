@@ -1,19 +1,8 @@
-"""
-SCAM SENSE AI — OCR Handler
-Extracts text from uploaded screenshot images using Tesseract OCR.
-"""
-
 import pytesseract
 from PIL import Image
 import os
 
 
-# ── Tesseract path for Windows (change if installed elsewhere) ───────────────
-# On Linux/Mac this line is not needed — comment it out if not on Windows
-# pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-
-
-# ── Allowed image modes for OCR ──────────────────────────────────────────────
 VALID_MODES = ("RGB", "L", "RGBA")
 
 
@@ -28,7 +17,7 @@ def extract_text_from_image(filepath: str) -> str:
         Extracted text as a clean string.
         Returns empty string if extraction fails.
     """
-    # Check file exists before opening
+   
     if not os.path.exists(filepath):
         print(f"[OCR] File not found: {filepath}")
         return ""
@@ -36,14 +25,11 @@ def extract_text_from_image(filepath: str) -> str:
     try:
         img = Image.open(filepath)
 
-        # Convert image to RGB for consistent OCR results
-        # Handles PNG with transparency (RGBA), grayscale, palette images
+       
         if img.mode not in ("RGB", "L"):
             img = img.convert("RGB")
 
-        # Tesseract config:
-        # --oem 3  = Default OCR Engine Mode (LSTM neural net)
-        # --psm 6  = Assume a single uniform block of text
+
         custom_config = r"--oem 3 --psm 6"
 
         extracted_text = pytesseract.image_to_string(
@@ -93,7 +79,7 @@ def extract_text_with_confidence(filepath: str) -> dict:
         if img.mode not in ("RGB", "L"):
             img = img.convert("RGB")
 
-        # Get detailed word-level OCR data
+ 
         data = pytesseract.image_to_data(img, output_type=pytesseract.Output.DICT)
 
         words = []
@@ -103,8 +89,7 @@ def extract_text_with_confidence(filepath: str) -> dict:
             word = word.strip()
             conf = int(data["conf"][i])
 
-            # Only include words with confidence above 0
-            # conf = -1 means non-text block
+      
             if word and conf > 0:
                 words.append(word)
                 confidences.append(conf)
