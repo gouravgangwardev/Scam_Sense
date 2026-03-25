@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}ScamSense AI{% endblock %}</title>
+
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <div id="loading-overlay">
+    <div class="loader-box">
+      <div class="loader-ring"></div>
+      <p class="loader-text">SCANNING<span class="dots">...</span></p>
+    </div>
+  </div>
+
+
+  <nav class="navbar">
+    <a href="{{ url_for('home') }}" class="nav-logo">
+      <span class="logo-icon">🛡</span>
+      <span class="logo-text">SCAM<span class="logo-accent">SENSE</span></span>
+      <span class="logo-tag">AI</span>
+    </a>
+    <div class="nav-links">
+      <a href="{{ url_for('home') }}"       class="nav-link {% if request.endpoint == 'home' %}active{% endif %}">SCAN</a>
+      <a href="{{ url_for('report_scam') }}" class="nav-link {% if request.endpoint == 'report_scam' %}active{% endif %}">REPORT</a>
+      <a href="{{ url_for('stats') }}"       class="nav-link {% if request.endpoint == 'stats' %}active{% endif %}">STATS</a>
+    </div>
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">&#9776;</button>
+  </nav>
+
+
+  <div class="mobile-nav" id="mobileNav">
+    <a href="{{ url_for('home') }}"        class="mob-link">SCAN</a>
+    <a href="{{ url_for('report_scam') }}" class="mob-link">REPORT</a>
+    <a href="{{ url_for('stats') }}"       class="mob-link">STATS</a>
+  </div>
+
+
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <span class="footer-brand">🛡 SCAMSENSE AI</span>
+      <span class="footer-sep">—</span>
+      <span class="footer-tagline">Protecting decisions, not just devices.</span>
+    </div>
+  </footer>
+
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>
