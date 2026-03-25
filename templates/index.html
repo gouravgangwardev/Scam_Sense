@@ -3,7 +3,7 @@
 
 {% block content %}
 
-
+<!-- ── Hero Section ─────────────────────────────────────────────────────── -->
 <section class="hero">
   <div class="hero-bg-grid"></div>
   <div class="hero-content">
@@ -17,7 +17,7 @@
     </h1>
     <p class="hero-sub">
       Paste a message, link, or upload a screenshot.<br>
-      Our AI analyzes it in seconds and warns you before you act.
+      Our system analyzes it in seconds and warns you before you act.
     </p>
     <div class="hero-stats">
       <div class="hstat"><span class="hstat-num">3</span><span class="hstat-lbl">Scan Types</span></div>
@@ -39,7 +39,7 @@
   </div>
 </section>
 
-
+<!-- ── Scan Section ─────────────────────────────────────────────────────── -->
 <section class="scan-section">
   <div class="section-label">
     <span class="section-line"></span>
@@ -49,7 +49,7 @@
 
   <div class="scan-grid">
 
-
+    <!-- ── Card 01: Message Scan ──────────────────────────────────────────── -->
     <div class="scan-card" id="card-message">
       <div class="card-header">
         <div class="card-icon msg-icon">✉</div>
@@ -64,6 +64,10 @@
         impersonation patterns, and credential theft attempts.
       </p>
       <form action="/scan/message" method="POST" class="scan-form" id="form-message">
+        <!-- Hidden fields for backend features -->
+        <input type="hidden" name="guardian" value="false">
+        <input type="hidden" name="lang" value="en">
+
         <textarea
           name="message_text"
           id="message_text"
@@ -81,7 +85,7 @@
       </form>
     </div>
 
-
+    <!-- ── Card 02: Link Scan ─────────────────────────────────────────────── -->
     <div class="scan-card" id="card-link">
       <div class="card-header">
         <div class="card-icon link-icon">🔗</div>
@@ -96,6 +100,9 @@
         brand impersonation, and dangerous domain structures.
       </p>
       <form action="/scan/link" method="POST" class="scan-form" id="form-link">
+        <!-- Hidden field for language -->
+        <input type="hidden" name="lang" value="en">
+
         <div class="url-input-wrap">
           <span class="url-prefix">https://</span>
           <input
@@ -117,7 +124,7 @@
       </form>
     </div>
 
- 
+    <!-- ── Card 03: Screenshot Scan ──────────────────────────────────────── -->
     <div class="scan-card" id="card-screenshot">
       <div class="card-header">
         <div class="card-icon img-icon">📷</div>
@@ -129,7 +136,7 @@
       </div>
       <p class="card-body">
         Upload a screenshot of a suspicious message, poster, or notice.
-        Our OCR engine extracts the text and AI analyzes it instantly.
+        Our OCR engine extracts the text and performs keyword-based scam detection.
       </p>
       <form action="/scan/screenshot" method="POST" enctype="multipart/form-data" class="scan-form" id="form-screenshot">
         <label class="file-drop" id="fileDrop">
@@ -147,7 +154,7 @@
           </div>
         </label>
         <button type="submit" class="scan-btn btn-screenshot">
-          <span class="btn-icon">🧠</span>
+          <span class="btn-icon">🔎</span>
           SCAN SCREENSHOT
         </button>
       </form>
@@ -156,7 +163,7 @@
   </div>
 </section>
 
-
+<!-- ── How It Works Section ─────────────────────────────────────────────── -->
 <section class="how-section">
   <div class="section-label">
     <span class="section-line"></span>
@@ -173,16 +180,16 @@
     <div class="how-arrow">→</div>
     <div class="how-step">
       <div class="step-num">02</div>
-      <div class="step-icon">🤖</div>
-      <h3 class="step-title">AI Analyzes</h3>
-      <p class="step-body">NLP engine scans for scam patterns</p>
+      <div class="step-icon">🔍</div>
+      <h3 class="step-title">System Analyzes</h3>
+      <p class="step-body">AI or rule-based engine scans for scam patterns</p>
     </div>
     <div class="how-arrow">→</div>
     <div class="how-step">
       <div class="step-num">03</div>
       <div class="step-icon">🛡</div>
       <h3 class="step-title">You Are Protected</h3>
-      <p class="step-body">Clear result + blocked link if dangerous</p>
+      <p class="step-body">Clear result with risk level and explanation</p>
     </div>
   </div>
 </section>
