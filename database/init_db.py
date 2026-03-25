@@ -10,7 +10,7 @@ Usage:
 import sqlite3
 import os
 
-# ── Database Path ─────────────────────────────────────────────────────────────
+
 DB_DIR  = os.path.dirname(os.path.abspath(__file__))
 DB_PATH = os.path.join(DB_DIR, "scans.db")
 
@@ -32,10 +32,6 @@ def initialize_database():
 
         print(f"\n[DB] Connected to: {DB_PATH}")
 
-        # ── Table 1: scans ────────────────────────────────────────────────────
-        # Logs every scan with FULL AI assessment result
-        # Stores: input type, risk level, risk score, AI explanation,
-        #         content preview, detection source, and timestamp
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS scans (
                 id              INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -52,8 +48,6 @@ def initialize_database():
         print("     Columns: id, input_type, risk_level, risk_score,")
         print("              explanation, content_preview, source, timestamp")
 
-        # ── Table 2: reports ──────────────────────────────────────────────────
-        # Stores scam reports submitted by users
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS reports (
                 id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -64,8 +58,7 @@ def initialize_database():
         """)
         print("[DB] Table 'reports'       — OK")
 
-        # ── Table 3: blocked_links ────────────────────────────────────────────
-        # Stores every URL that was classified as DANGEROUS
+       
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS blocked_links (
                 id          INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -79,7 +72,7 @@ def initialize_database():
 
         conn.commit()
 
-        # ── Verify all tables were created ────────────────────────────────────
+      
         cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
         tables = [row[0] for row in cursor.fetchall()]
         print(f"\n[DB] Tables in database : {', '.join(tables)}")
@@ -174,7 +167,7 @@ def reset_database():
         return False
 
 
-# ── Run directly ──────────────────────────────────────────────────────────────
+
 if __name__ == "__main__":
 
     initialize_database()
