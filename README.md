@@ -62,74 +62,6 @@ scam-sense-ai/
 
 ### Install Tesseract OCR
 
-**Windows:**
-Download installer from https://github.com/tesseract-ocr/tesseract
-and add it to your system PATH.
-
-**Linux (Ubuntu/Debian):**
-```bash
-sudo apt install tesseract-ocr
-```
-
-**Mac:**
-```bash
-brew install tesseract
-```
-
----
-
-##  Setup and Run
-
-### Step 1 — Clone or download the project
-```bash
-git clone https://github.com/yourusername/scam-sense-ai.git
-cd scam-sense-ai
-```
-
-### Step 2 — Create and activate virtual environment
-```bash
-# Create
-python -m venv venv
-
-# Activate on Windows
-venv\Scripts\activate
-
-# Activate on Mac / Linux
-source venv/bin/activate
-```
-
-### Step 3 — Install all dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### Step 4 — Set up your .env file
-```bash
-# Open .env and set your secret key
-SECRET_KEY=your-long-random-secret-key-here
-AI_ENGINE_URL=http://localhost:8000/analyze
-DEBUG=True
-PORT=5000
-```
-
-### Step 5 — Start the project
-```bash
-python run.py
-```
-
-`run.py` automatically:
-- Creates `.env` if missing
-- Creates `uploads/` folder if missing
-- Initializes the database if not found
-- Runs safety cleanup on old uploads
-- Starts the Flask server
-
-### Step 6 — Open in browser
-```
-http://localhost:5000
-```
-
----
 
 ## 🔌 AI Engine
 
@@ -213,14 +145,5 @@ Expected AI engine response format:
 - Designed to protect students and senior citizens from digital fraud
 - Pre-action intervention — stops fraud before financial loss occurs
 
----
-
-## ⚠️ Important Notes
-
-- Never share your `.env` file — it contains your secret key
-- Always change `SECRET_KEY` before deploying to production
-- Set `DEBUG=False` in production
-- Use Gunicorn instead of Flask dev server for production:
-```bash
 gunicorn -w 4 app:app --bind 0.0.0.0:5000
 ```
