@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Scan Statistics — ScamSense AI{% endblock %}
+
+{% block content %}
+
+<section class="stats-page">
+
+  <!-- Header -->
+  <div class="stats-header">
+    <div class="form-icon">📊</div>
+    <h1 class="form-title">SCAN STATISTICS</h1>
+    <p class="form-subtitle">Real-time fraud detection activity log</p>
+  </div>
+
+  <!-- ── Summary Cards ── -->
+  <div class="stats-cards">
+
+    <div class="stat-card stat-total">
+      <div class="stat-icon">📋</div>
+      <div class="stat-num">{{ summary.total }}</div>
+      <div class="stat-lbl">TOTAL SCANS</div>
+    </div>
+
+    <div class="stat-card stat-safe">
+      <div class="stat-icon">✅</div>
+      <div class="stat-num safe-text">{{ summary.safe }}</div>
+      <div class="stat-lbl">SAFE</div>
+    </div>
+
+    <div class="stat-card stat-suspicious">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-num suspicious-text">{{ summary.suspicious }}</div>
+      <div class="stat-lbl">SUSPICIOUS</div>
+    </div>
+
+    <div class="stat-card stat-dangerous">
+      <div class="stat-icon">⛔</div>
+      <div class="stat-num danger-text">{{ summary.dangerous }}</div>
+      <div class="stat-lbl">DANGEROUS</div>
+    </div>
+
+  </div>
+
+  <!-- ── Detection Rate Bar ── -->
+  {% if summary.total > 0 %}
+  <div class="detection-bar-section">
+    <div class="dbar-label">THREAT DETECTION BREAKDOWN</div>
+    <div class="dbar-track">
+      {% set safe_pct = ((summary.safe / summary.total) * 100) | round | int %}
+      {% set susp_pct = ((summary.suspicious / summary.total) * 100) | round | int %}
+      {% set dang_pct = ((summary.dangerous / summary.total) * 100) | round | int %}
+      <div class="dbar-safe"    style="width: {{ safe_pct }}%">
+        {% if safe_pct > 10 %}{{ safe_pct }}%{% endif %}
+      </div>
+      <div class="dbar-suspicious" style="width: {{ susp_pct }}%">
+        {% if susp_pct > 10 %}{{ susp_pct }}%{% endif %}
+      </div>
+      <div class="dbar-dangerous" style="width: {{ dang_pct }}%">
+        {% if dang_pct > 10 %}{{ dang_pct }}%{% endif %}
+      </div>
+    </div>
+    <div class="dbar-legend">
+      <span class="legend-dot safe-dot"></span> Safe
+      <span class="legend-dot susp-dot"></span> Suspicious
+      <span class="legend-dot dang-dot"></span> Dangerous
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- ── Recent Scans Table ── -->
+  <div class="table-section">
+    <div class="table-header">
+      <span class="table-title">RECENT SCANS</span>
+      <span class="table-sub">Last {{ recent_scans | length }} records</span>
+    </div>
+
+    {% if recent_scans %}
+    <div class="table-wrap">
+      <table class="scans-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>TYPE</th>
+            <th>RISK LEVEL</th>
+            <th>TIMESTAMP</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for scan in recent_scans %}
+          <tr class="table-row">
+            <td class="td-num">{{ loop.index }}</td>
+            <td>
+              <span class="type-badge">
+                {% if scan[0] == "message" %}✉ MESSAGE
+                {% elif scan[0] == "link" %}🔗 LINK
+                {% elif scan[0] == "screenshot" %}📷 SCREENSHOT
+                {% else %}{{ scan[0] | upper }}
+                {% endif %}
+              </span>
+            </td>
+            <td>
+              <span class="risk-badge
+                {% if scan[1] == 'DANGEROUS' %}risk-danger
+                {% elif scan[1] == 'SUSPICIOUS' %}risk-suspicious
+                {% else %}risk-safe{% endif %}">
+                {% if scan[1] == 'DANGEROUS' %}⛔
+                {% elif scan[1] == 'SUSPICIOUS' %}⚠
+                {% else %}✅{% endif %}
+                {{ scan[1] }}
+              </span>
+            </td>
+            <td class="td-time">{{ scan[2][:19] | replace("T", " ") }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📭</div>
+      <p class="empty-text">No scans yet. Go scan something!</p>
+      <a href="{{ url_for('home') }}" class="result-btn btn-home-safe">START SCANNING</a>
+    </div>
+    {% endif %}
+
+  </div>
+
+</section>
+
+{% endblock %}

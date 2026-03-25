@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Report a Scam — ScamSense AI{% endblock %}
+
+{% block content %}
+
+<section class="form-page">
+  <div class="form-container">
+
+
+    <div class="form-header">
+      <div class="form-icon">📢</div>
+      <h1 class="form-title">REPORT A SCAM</h1>
+      <p class="form-subtitle">
+        Help protect others. Submit scam content you have received
+        and our team will use it to improve AI detection.
+      </p>
+    </div>
+
+
+    <form action="{{ url_for('report_scam') }}" method="POST" class="report-form" id="reportForm">
+
+
+      <div class="field-group">
+        <label class="field-label" for="report_type">
+          <span class="label-num">01</span>
+          WHAT TYPE OF SCAM IS THIS?
+        </label>
+        <div class="select-wrap">
+          <select name="report_type" id="report_type" class="field-select" required>
+            <option value="" disabled selected>Select scam type...</option>
+            <option value="message">📱 Suspicious Message (SMS / WhatsApp)</option>
+            <option value="link">🔗 Phishing Link / Website</option>
+            <option value="call">📞 Scam Phone Call</option>
+            <option value="screenshot">📷 Screenshot of Scam</option>
+            <option value="other">⚠ Other</option>
+          </select>
+          <span class="select-arrow">▾</span>
+        </div>
+      </div>
+
+
+      <div class="field-group">
+        <label class="field-label" for="report_content">
+          <span class="label-num">02</span>
+          PASTE OR DESCRIBE THE SCAM CONTENT
+        </label>
+        <textarea
+          name="report_content"
+          id="report_content"
+          class="field-textarea"
+          placeholder="Paste the exact scam message, URL, or describe what happened...&#10;&#10;The more detail you provide, the better our AI can learn to detect similar scams."
+          rows="8"
+          maxlength="10000"
+          required
+        ></textarea>
+        <div class="char-counter">
+          <span id="report-count">0</span> / 10000
+        </div>
+      </div>
+
+
+      <div class="report-info">
+        <div class="info-icon">🔒</div>
+        <p>
+          Your report is stored securely and used only to improve scam detection.
+          No personal information is required.
+        </p>
+      </div>
+
+
+      <button type="submit" class="scan-btn btn-report-submit">
+        <span class="btn-icon">📤</span>
+        SUBMIT REPORT
+      </button>
+
+    </form>
+
+  </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% block title %}ScamSense AI — Fraud Prevention{% endblock %}
+
+{% block content %}
+
+
+<section class="hero">
+  <div class="hero-bg-grid"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      AI-POWERED FRAUD DETECTION
+    </div>
+    <h1 class="hero-title">
+      STOP SCAMS<br>
+      <span class="hero-title-accent">BEFORE THEY STRIKE</span>
+    </h1>
+    <p class="hero-sub">
+      Paste a message, link, or upload a screenshot.<br>
+      Our AI analyzes it in seconds and warns you before you act.
+    </p>
+    <div class="hero-stats">
+      <div class="hstat"><span class="hstat-num">3</span><span class="hstat-lbl">Scan Types</span></div>
+      <div class="hstat-div"></div>
+      <div class="hstat"><span class="hstat-num">AI</span><span class="hstat-lbl">Detection Engine</span></div>
+      <div class="hstat-div"></div>
+      <div class="hstat"><span class="hstat-num">0s</span><span class="hstat-lbl">Loss Risk</span></div>
+    </div>
+  </div>
+  <div class="hero-shield">
+    <div class="shield-outer">
+      <div class="shield-inner">
+        <span class="shield-emoji">🛡</span>
+      </div>
+    </div>
+    <div class="shield-ring r1"></div>
+    <div class="shield-ring r2"></div>
+    <div class="shield-ring r3"></div>
+  </div>
+</section>
+
+
+<section class="scan-section">
+  <div class="section-label">
+    <span class="section-line"></span>
+    SELECT SCAN TYPE
+    <span class="section-line"></span>
+  </div>
+
+  <div class="scan-grid">
+
+
+    <div class="scan-card" id="card-message">
+      <div class="card-header">
+        <div class="card-icon msg-icon">✉</div>
+        <div>
+          <h2 class="card-title">MESSAGE SCAN</h2>
+          <p class="card-desc">SMS · WhatsApp · Email</p>
+        </div>
+        <div class="card-num">01</div>
+      </div>
+      <p class="card-body">
+        Paste any suspicious message you received. Our AI detects urgency tactics,
+        impersonation patterns, and credential theft attempts.
+      </p>
+      <form action="/scan/message" method="POST" class="scan-form" id="form-message">
+        <textarea
+          name="message_text"
+          id="message_text"
+          class="scan-textarea"
+          placeholder="Paste suspicious message here...&#10;&#10;Example: 'Your account has been blocked. Click link to verify KYC immediately.'"
+          rows="5"
+          maxlength="5000"
+          required
+        ></textarea>
+        <div class="char-counter"><span id="msg-count">0</span> / 5000</div>
+        <button type="submit" class="scan-btn btn-message">
+          <span class="btn-icon">⚡</span>
+          SCAN MESSAGE
+        </button>
+      </form>
+    </div>
+
+
+    <div class="scan-card" id="card-link">
+      <div class="card-header">
+        <div class="card-icon link-icon">🔗</div>
+        <div>
+          <h2 class="card-title">LINK SCAN</h2>
+          <p class="card-desc">URL · Website · Domain</p>
+        </div>
+        <div class="card-num">02</div>
+      </div>
+      <p class="card-body">
+        Paste any suspicious URL before clicking it. We check for phishing patterns,
+        brand impersonation, and dangerous domain structures.
+      </p>
+      <form action="/scan/link" method="POST" class="scan-form" id="form-link">
+        <div class="url-input-wrap">
+          <span class="url-prefix">https://</span>
+          <input
+            type="text"
+            name="url"
+            id="url_input"
+            class="scan-input"
+            placeholder="paste-suspicious-link-here.com"
+            required
+          />
+        </div>
+        <div class="link-warning">
+          ⚠ Never click the link directly — paste it here safely
+        </div>
+        <button type="submit" class="scan-btn btn-link">
+          <span class="btn-icon">🔍</span>
+          SCAN LINK
+        </button>
+      </form>
+    </div>
+
+ 
+    <div class="scan-card" id="card-screenshot">
+      <div class="card-header">
+        <div class="card-icon img-icon">📷</div>
+        <div>
+          <h2 class="card-title">SCREENSHOT SCAN</h2>
+          <p class="card-desc">JPG · PNG · Image</p>
+        </div>
+        <div class="card-num">03</div>
+      </div>
+      <p class="card-body">
+        Upload a screenshot of a suspicious message, poster, or notice.
+        Our OCR engine extracts the text and AI analyzes it instantly.
+      </p>
+      <form action="/scan/screenshot" method="POST" enctype="multipart/form-data" class="scan-form" id="form-screenshot">
+        <label class="file-drop" id="fileDrop">
+          <input
+            type="file"
+            name="screenshot"
+            id="file_input"
+            accept=".jpg,.jpeg,.png"
+            required
+          />
+          <div class="drop-content" id="dropContent">
+            <span class="drop-icon">📂</span>
+            <span class="drop-text">Click to upload or drag image here</span>
+            <span class="drop-sub">JPG or PNG · Max 5MB</span>
+          </div>
+        </label>
+        <button type="submit" class="scan-btn btn-screenshot">
+          <span class="btn-icon">🧠</span>
+          SCAN SCREENSHOT
+        </button>
+      </form>
+    </div>
+
+  </div>
+</section>
+
+
+<section class="how-section">
+  <div class="section-label">
+    <span class="section-line"></span>
+    HOW IT WORKS
+    <span class="section-line"></span>
+  </div>
+  <div class="how-grid">
+    <div class="how-step">
+      <div class="step-num">01</div>
+      <div class="step-icon">📥</div>
+      <h3 class="step-title">You Submit</h3>
+      <p class="step-body">Paste message, URL, or upload screenshot</p>
+    </div>
+    <div class="how-arrow">→</div>
+    <div class="how-step">
+      <div class="step-num">02</div>
+      <div class="step-icon">🤖</div>
+      <h3 class="step-title">AI Analyzes</h3>
+      <p class="step-body">NLP engine scans for scam patterns</p>
+    </div>
+    <div class="how-arrow">→</div>
+    <div class="how-step">
+      <div class="step-num">03</div>
+      <div class="step-icon">🛡</div>
+      <h3 class="step-title">You Are Protected</h3>
+      <p class="step-body">Clear result + blocked link if dangerous</p>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

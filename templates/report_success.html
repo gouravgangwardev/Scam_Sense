@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Report Submitted — ScamSense AI{% endblock %}
+
+{% block content %}
+
+<section class="success-page">
+  <div class="success-container">
+
+
+    <div class="success-icon-wrap safe-pulse">
+      <div class="success-icon">✅</div>
+    </div>
+
+    <div class="result-badge badge-safe">● REPORT RECEIVED</div>
+
+    <h1 class="success-title safe-text">THANK YOU</h1>
+
+    <p class="success-msg">
+      Your scam report has been <strong>saved successfully</strong>.
+      It will be reviewed and used to improve our AI detection system,
+      helping protect more people from fraud.
+    </p>
+
+
+    <div class="next-steps">
+      <div class="next-label">WHAT HAPPENS NEXT:</div>
+      <div class="next-grid">
+        <div class="next-item">
+          <span class="next-icon">💾</span>
+          <span class="next-text">Report stored in our database</span>
+        </div>
+        <div class="next-item">
+          <span class="next-icon">🤖</span>
+          <span class="next-text">AI trains on new scam patterns</span>
+        </div>
+        <div class="next-item">
+          <span class="next-icon">🛡</span>
+          <span class="next-text">Future users get better protection</span>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="result-actions">
+      <a href="{{ url_for('home') }}" class="result-btn btn-home-safe">
+        ← SCAN ANOTHER
+      </a>
+      <a href="{{ url_for('report_scam') }}" class="result-btn btn-report-another">
+        📢 REPORT ANOTHER
+      </a>
+    </div>
+
+  </div>
+</section>
+
+{% endblock %}

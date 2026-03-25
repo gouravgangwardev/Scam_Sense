@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}
+  {% if error_code == 404 %}Page Not Found
+  {% elif error_code == 429 %}Too Many Requests
+  {% elif error_code == 413 %}File Too Large
+  {% elif error_code == 500 %}Server Error
+  {% else %}Error
+  {% endif %}
+  — ScamSense AI
+{% endblock %}
+
+{% block content %}
+
+<section class="error-page">
+  <div class="error-container">
+
+
+    <div class="error-code-wrap">
+      <div class="error-code">
+        {% if error_code == 404 %}404
+        {% elif error_code == 429 %}429
+        {% elif error_code == 413 %}413
+        {% elif error_code == 500 %}500
+        {% elif error_code == 400 %}400
+        {% elif error_code == 405 %}405
+        {% elif error_code == "OCR" %}OCR
+        {% elif error_code == "AI" %}AI
+        {% else %}ERR
+        {% endif %}
+      </div>
+      <div class="error-glow"></div>
+    </div>
+
+
+    <div class="error-icon">
+      {% if error_code == 404 %}🔍
+      {% elif error_code == 429 %}⏱
+      {% elif error_code == 413 %}📦
+      {% elif error_code == 500 %}⚙
+      {% elif error_code == 400 %}✏
+      {% elif error_code == 405 %}🚫
+      {% elif error_code == "OCR" %}👁
+      {% elif error_code == "AI" %}🤖
+      {% else %}⚠
+      {% endif %}
+    </div>
+
+
+    <h1 class="error-title">{{ error_title }}</h1>
+
+
+    <p class="error-message">{{ error_message }}</p>
+
+
+    {% if error_code == 413 %}
+    <div class="error-tip">
+      💡 <strong>Tip:</strong> Compress your image using a free tool like
+      <em>tinypng.com</em> or take a lower resolution screenshot.
+    </div>
+    {% elif error_code == 429 %}
+    <div class="error-tip">
+      💡 <strong>Tip:</strong> The system allows 10 scans per minute.
+      Wait 60 seconds and try again.
+    </div>
+    {% elif error_code == "OCR" %}
+    <div class="error-tip">
+      💡 <strong>Tip:</strong> Make sure your screenshot has clear, readable text.
+      Avoid heavily blurred or handwritten images.
+    </div>
+    {% elif error_code == 404 %}
+    <div class="error-tip">
+      💡 <strong>Tip:</strong> The page you were looking for doesn't exist.
+      Use the navigation links above.
+    </div>
+    {% endif %}
+
+   
+    {% if show_home_button %}
+    <div class="result-actions">
+      <a href="{{ url_for('home') }}" class="result-btn btn-home-safe">
+        ← GO BACK HOME
+      </a>
+    </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{% endblock %}
