@@ -63,7 +63,7 @@ scam-sense-ai/
 ### Install Tesseract OCR
 
 
-## 🔌 AI Engine
+##  AI Engine
 
 The system sends scan content to an external AI engine at `AI_ENGINE_URL`.
 
@@ -82,7 +82,7 @@ Expected AI engine response format:
 
 ---
 
-## 📊 Risk Levels
+##  Risk Levels
 
 | Level | Color | Meaning |
 |---|---|---|
@@ -92,7 +92,7 @@ Expected AI engine response format:
 
 ---
 
-## 🗄️ Database Tables
+##  Database Tables
 
 | Table | Purpose |
 |---|---|
@@ -102,7 +102,7 @@ Expected AI engine response format:
 
 ---
 
-## 🚦 Rate Limits
+##  Rate Limits
 
 | Route | Limit |
 |---|---|
@@ -113,7 +113,7 @@ Expected AI engine response format:
 
 ---
 
-## 🛡️ Security Features
+##  Security Features
 
 - Input validation on all scan routes
 - File type and size validation (JPG/PNG, max 5MB)
@@ -125,7 +125,7 @@ Expected AI engine response format:
 
 ---
 
-## 📦 Dependencies
+## Dependencies
 
 | Library | Purpose |
 |---|---|
@@ -139,11 +139,11 @@ Expected AI engine response format:
 
 ---
 
-## 👥 Built For
+## Built For
 
 - College project — handles up to 100 concurrent users
 - Designed to protect students and senior citizens from digital fraud
 - Pre-action intervention — stops fraud before financial loss occurs
 
-gunicorn -w 4 app:app --bind 0.0.0.0:5000
+
 ```
